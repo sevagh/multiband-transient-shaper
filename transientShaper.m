@@ -1,4 +1,4 @@
-function [y, envFast, envSlow, envDiff] = transientShaper(x, fs, attackFastMs, attackSlowMs, releaseMs)
+function [attackEnv, sustainEnv] = transientShaper(x, fs, attackFastMs, attackSlowMs, releaseMs)
     % params
     gAttackFast = exp(-1/(fs*attackFastMs/1000));
     gAttackSlow = exp(-1/(fs*attackSlowMs/1000));
@@ -52,6 +52,9 @@ function [y, envFast, envSlow, envDiff] = transientShaper(x, fs, attackFastMs, a
         envDiff(n, 1) = envFast(n, 1) - envSlow(n, 1);
     end
     
-    y = x.*envDiff;
-    y = y/max(abs(y));
+    envDiff = envDiff/max(envDiff);
+    invEnvDiff = 1 - envDiff;
+    
+    attackEnv = envDiff;
+    sustainEnv = invEnvDiff;
 end

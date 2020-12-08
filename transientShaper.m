@@ -1,7 +1,9 @@
-function [attackEnv, sustainEnv] = transientShaper(x, fs, attackFastMs, attackSlowMs, releaseMs)
+function [fastEnv, slowEnv, attackEnv, sustainEnv] = transientShaper(...
+    x, fs, attackFastMs, attackSlowMs, releaseMs)
+
     % params
-    gAttackFast = exp(-1/(fs*attackFastMs/1000));
-    gAttackSlow = exp(-1/(fs*attackSlowMs/1000));
+    gAttFast = exp(-1/(fs*attackFastMs/1000));
+    gAttSlow = exp(-1/(fs*attackSlowMs/1000));
     gRelease = exp(-1/(fs*releaseMs/1000));
 
     fbFast = 0; % feedback terms
@@ -9,52 +11,53 @@ function [attackEnv, sustainEnv] = transientShaper(x, fs, attackFastMs, attackSl
 
     N = length(x);
 
-    envFast = zeros(N, 1);
-    envSlow = zeros(N, 1);
+    fastEnv = zeros(N, 1);
+    slowEnv = zeros(N, 1);
 
-    xPower = zeros(N, 1);
+    xPow = zeros(N, 1);
     powerMemoryMs = 1;
-    gPowerMem = exp(-1/(fs*powerMemoryMs/1000));
-    fbPowerMem = 0; % feedback term
+    gPowMem = exp(-1/(fs*powerMemoryMs/1000));
+    fbPowMem = 0; % feedback term
 
     % signal power
     for n = 1:N
-        xPower(n, 1) = (1 - gPowerMem)* x(n) * x(n) + gPowerMem*fbPowerMem;
-        fbPowerMem = xPower(n, 1);
+        xPow(n, 1) = (1 - gPowMem)* x(n) * x(n) + gPowMem*fbPowMem;
+        fbPowMem = xPow(n, 1);
     end
 
     % derivative of signal power with simple 1-sample differentiator
     xDerivativePower = zeros(N, 1);
 
-    xDerivativePower(1, 1) = xPower(1, 1);
+    xDerivativePower(1, 1) = xPow(1, 1);
 
     for n = 2:N
-        xDerivativePower(n, 1) = xPower(n, 1) - xPower(n-1, 1);
+        xDerivativePower(n, 1) = xPow(n, 1) - xPow(n-1, 1);
     end
 
-    envDiff = zeros(N, 1);
+    attackEnv = zeros(N, 1);
 
     for n = 1:N
         if fbFast > xDerivativePower(n, 1)
-            envFast(n, 1) = (1 - gRelease) * xDerivativePower(n, 1) + gRelease * fbFast;
+            fastEnv(n, 1) = (1 - gRelease) * xDerivativePower(n, 1) +...
+                gRelease * fbFast;
         else
-            envFast(n, 1) = (1 - gAttackFast) * xDerivativePower(n, 1) + gAttackFast * fbFast;
+            fastEnv(n, 1) = (1 - gAttFast) * xDerivativePower(n, 1) +...
+                gAttFast * fbFast;
         end
-        fbFast = envFast(n, 1);
+        fbFast = fastEnv(n, 1);
 
         if fbSlow > xDerivativePower(n, 1)
-            envSlow(n, 1) = (1 - gRelease) * xDerivativePower(n, 1) + gRelease * fbSlow;
+            slowEnv(n, 1) = (1 - gRelease) * xDerivativePower(n, 1) +...
+                gRelease * fbSlow;
         else
-            envSlow(n, 1) = (1 - gAttackSlow) * xDerivativePower(n, 1) + gAttackSlow * fbSlow;
+            slowEnv(n, 1) = (1 - gAttSlow) * xDerivativePower(n, 1) +...
+                gAttSlow * fbSlow;
         end
-        fbSlow = envSlow(n, 1);
+        fbSlow = slowEnv(n, 1);
 
-        envDiff(n, 1) = envFast(n, 1) - envSlow(n, 1);
+        attackEnv(n, 1) = fastEnv(n, 1) - slowEnv(n, 1);
     end
     
-    envDiff = envDiff/max(envDiff);
-    invEnvDiff = 1 - envDiff;
-    
-    attackEnv = envDiff;
-    sustainEnv = invEnvDiff;
+    attackEnv = attackEnv/max(attackEnv);
+    sustainEnv = 1 - attackEnv;
 end

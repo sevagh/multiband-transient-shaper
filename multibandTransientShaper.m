@@ -1,8 +1,8 @@
 function multibandTransientShaper(path)
     [x, fs] = audioread(path);
-
+    
     b = hz2bark([20, 20000]);
-    barkVect = linspace(b(1), b(2), 40);
+    barkVect = linspace(b(1), b(2), 24);
     hzVect = bark2hz(barkVect);
 
     yEnhanced = zeros(size(x));
@@ -14,14 +14,29 @@ function multibandTransientShaper(path)
 
     for bands = 1:1:size(hzVect, 2)-1
         bandEdges = hzVect(bands:bands+1);
-        display(bandEdges)
+        fprintf("band %s - %s Hz\n", bandEdges(1), bandEdges(2));
+        
         y = bandpass(x, bandEdges, fs);
-
-        [attack, sustain] = transientShaper(y, fs,...
+       
+        [fast, slow, attack, sustain] = transientShaper(y, fs,...
             attackFastMs, attackSlowMs, releaseMs);
-
-        yEnhanced = yEnhanced + y .* attack;
-        ySuppressed = ySuppressed + y .* sustain;
+        
+        %figure;
+        %plot(fast); hold on; plot(slow); plot(attack);
+        %legend('fast', 'slow', 'attack');
+        %title(sprintf("Envelopes, band %f-%f Hz", bandEdges(1),...
+        %    bandEdges(2)));
+        
+        yTransientEnhanced = y .* attack;
+        yTransientSuppressed = y .* sustain;
+        
+        %figure;
+        %plot(y); hold on; plot(yTransientEnhanced);
+        %title(sprintf("Waveforms, band %f-%f Hz", bandEdges(1),...
+        %    bandEdges(2)));
+        
+        yEnhanced = yEnhanced + yTransientEnhanced;
+        ySuppressed = ySuppressed + yTransientSuppressed;
     end
     
     yEnhanced = yEnhanced/max(abs(yEnhanced));

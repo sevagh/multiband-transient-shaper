@@ -26,7 +26,7 @@ function multibandTransientShaperSimpleWithPlots(path)
         plot(fast);
         hold on;
         plot(slow);
-        plot(fast-slow);
+        plot(fast - slow);
         legend('fast', 'slow', 'difference');
         title("Envelopes");
         

@@ -19,7 +19,7 @@ The method is the SPL differential envelope applied across 24 Bark frequency ban
 6. Apply the desired gain curve (attack, sustain) on the band-passed signal
 7. Sum all transient-enhanced (or -suppressed) 24 band-passed signals to produce the final, transient-sculpted audio
 
-There are [MATLAB](./matlab) and [Python](./python) versions. The Python version includes a demo combined with harmonic-percussive source separation to perform some form of noise-gated drum beat extraction.
+There is a [MATLAB](./matlab) version. If you need help developing non-MATLAB code, let me know.
 
 #### What's it for?
 
@@ -33,6 +33,12 @@ Table of audio clip results on a mixed song (first 10 seconds of [Misha Mansoor 
 |---|--------|--------|--------|-----|-----|
 | Mix | ![mix1](./assets/mix_in.wav) | ![mix2](./assets/mix_unbanded_enhanced.wav) | ![mix3](./assets/mix_unbanded_suppressed.wav) | ![mix4](./assets/mix_banded_enhanced.wav) | ![mix5](./assets/mix_banded_suppressed.wav) |
 | Drum track | ![drum1](./assets/drum_in.wav) | ![drum2](./assets/drum_unbanded_enhanced.wav) | ![drum3](./assets/drum_unbanded_suppressed.wav) | ![drum4](./assets/drum_banded_enhanced.wav) | ![drum5](./assets/drum_banded_suppressed.wav) |
+
+As an example of combining this with other algorithms, here's a chain of [Harmonic-Percussive Source Separation](https://github.com/sevagh/Real-Time-HPSS/blob/master/matlab/HPSS.m) + multiband transient enhancer (applying the attack gain curve) to create a cleanly gated drum beat extraction of the mixed audio clip above:
+
+![HPSS pre-transient shaper](./assets/mix_hpss_pre.wav) ![HPSS post-transient shaper](./assets/mix_hpss_post.wav)
+
+Note that while it doesn't sound perceptually great, the result is a very good separation of percussive beats from the mix.
 
 ### Results on drum track, plots
 

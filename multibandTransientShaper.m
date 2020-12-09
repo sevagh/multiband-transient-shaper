@@ -9,32 +9,21 @@ function multibandTransientShaper(path)
     ySuppressed = zeros(size(x));
 
     attackFastMs = 1;
-    attackSlowMs = 10;
-    releaseMs = 30;
+    attackSlowMs = 15;
+    releaseMs = 20;
 
     for bands = 1:1:size(hzVect, 2)-1
         bandEdges = hzVect(bands:bands+1);
-        fprintf("band %s - %s Hz\n", bandEdges(1), bandEdges(2));
+        fprintf("band %f - %f Hz\n", bandEdges(1), bandEdges(2));
         
         y = bandpass(x, bandEdges, fs);
        
         [fast, slow, attack, sustain] = transientShaper(y, fs,...
             attackFastMs, attackSlowMs, releaseMs);
-        
-        %figure;
-        %plot(fast); hold on; plot(slow); plot(attack);
-        %legend('fast', 'slow', 'attack');
-        %title(sprintf("Envelopes, band %f-%f Hz", bandEdges(1),...
-        %    bandEdges(2)));
-        
+
         yTransientEnhanced = y .* attack;
         yTransientSuppressed = y .* sustain;
-        
-        %figure;
-        %plot(y); hold on; plot(yTransientEnhanced);
-        %title(sprintf("Waveforms, band %f-%f Hz", bandEdges(1),...
-        %    bandEdges(2)));
-        
+
         yEnhanced = yEnhanced + yTransientEnhanced;
         ySuppressed = ySuppressed + yTransientSuppressed;
     end

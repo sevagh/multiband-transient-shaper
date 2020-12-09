@@ -19,6 +19,8 @@ The method is the SPL differential envelope applied across 24 Bark frequency ban
 6. Apply the desired gain curve (attack, sustain) on the band-passed signal
 7. Sum all transient-enhanced (or -suppressed) 24 band-passed signals to produce the final, transient-sculpted audio
 
+There are [MATLAB](./matlab) and [Python](./python) versions. The Python version includes a demo combined with harmonic-percussive source separation to perform some form of noise-gated drum beat extraction.
+
 #### What's it for?
 
 The transient shaper is related to dynamic range  compressors, expanders, limiters, and noisegates - exactly how is not my forte, I'm not an audio engineer. I use the transient enhancer/attack gain curve creates a noise-gate-like effect, making it potentially useful for enhancing strong percussive beats for futher MIR algorithms (e.g. beat tracking). You should listen for yourself to see if you'll find this useful.
@@ -35,8 +37,6 @@ Table of audio clip results on a mixed song (first 10 seconds of [Misha Mansoor 
 ### Results on drum track, plots
 
 There is a script variant with intermediate steps plotted, using only 4 frequency bands instead of all 24 for illustrative purposes.
-
-#### Multi-band transient shaper
 
 Banded envelopes and intermediate waveforms:
 

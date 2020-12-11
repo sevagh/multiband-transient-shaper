@@ -19,7 +19,7 @@ The method is the SPL differential envelope applied across 24 Bark frequency ban
 6. Apply the desired gain curve (attack, sustain) on the band-passed signal
 7. Sum all transient-enhanced (or -suppressed) 24 band-passed signals to produce the final, transient-sculpted audio
 
-There is a [MATLAB](./matlab) version. If you need help developing non-MATLAB code, let me know.
+There are [MATLAB](./matlab) and [Python 3](./python) implementations.
 
 #### What's it for?
 
